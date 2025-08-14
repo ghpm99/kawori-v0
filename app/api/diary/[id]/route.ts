@@ -1,4 +1,10 @@
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
+
+interface RouteParams {
+  params: {
+    id: string
+  }
+}
 
 // This would normally come from a database
 const activities = [
@@ -34,56 +40,61 @@ const activities = [
   },
 ]
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params
+// GET /api/diary/[id] - Get a specific diary entry
+export async function GET(request: NextRequest, { params }: RouteParams) {
+  try {
+    const { id } = params
 
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 300))
+    // Mock data - replace with actual database query
+    const mockEntry = {
+      id,
+      date: new Date().toISOString(),
+      title: "Sample Entry",
+      content: "This is a sample diary entry",
+      mood: "happy",
+      tags: ["work", "productivity"],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
 
-  const activity = activities.find((a) => a.id === id)
-
-  if (!activity) {
-    return NextResponse.json({ error: "Activity not found" }, { status: 404 })
+    return NextResponse.json(mockEntry)
+  } catch (error) {
+    console.error("Error fetching diary entry:", error)
+    return NextResponse.json({ error: "Failed to fetch diary entry" }, { status: 500 })
   }
-
-  return NextResponse.json(activity)
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params
-  const body = await request.json()
+// PUT /api/diary/[id] - Update a specific diary entry
+export async function PUT(request: NextRequest, { params }: RouteParams) {
+  try {
+    const { id } = params
+    const body = await request.json()
 
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500))
+    // Mock update - replace with actual database update
+    const updatedEntry = {
+      id,
+      ...body,
+      updatedAt: new Date().toISOString(),
+    }
 
-  const activityIndex = activities.findIndex((a) => a.id === id)
-
-  if (activityIndex === -1) {
-    return NextResponse.json({ error: "Activity not found" }, { status: 404 })
+    return NextResponse.json(updatedEntry)
+  } catch (error) {
+    console.error("Error updating diary entry:", error)
+    return NextResponse.json({ error: "Failed to update diary entry" }, { status: 500 })
   }
-
-  activities[activityIndex] = {
-    ...activities[activityIndex],
-    ...body,
-    updatedAt: new Date().toISOString(),
-  }
-
-  return NextResponse.json(activities[activityIndex])
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params
+// DELETE /api/diary/[id] - Delete a specific diary entry
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  try {
+    const { id } = params
 
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500))
+    // Mock deletion - replace with actual database deletion
+    console.log(`Deleting diary entry with id: ${id}`)
 
-  const activityIndex = activities.findIndex((a) => a.id === id)
-
-  if (activityIndex === -1) {
-    return NextResponse.json({ error: "Activity not found" }, { status: 404 })
+    return NextResponse.json({ message: "Activity deleted successfully" })
+  } catch (error) {
+    console.error("Error deleting diary entry:", error)
+    return NextResponse.json({ error: "Failed to delete diary entry" }, { status: 500 })
   }
-
-  activities.splice(activityIndex, 1)
-
-  return NextResponse.json({ message: "Activity deleted successfully" })
 }

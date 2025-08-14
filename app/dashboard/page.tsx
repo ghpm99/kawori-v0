@@ -7,7 +7,7 @@ import {
   DollarOutlined,
   ShoppingCartOutlined,
   TrophyOutlined,
-  TrendingUpOutlined,
+  RiseOutlined,
   EyeOutlined,
   EditOutlined,
   DeleteOutlined,
@@ -178,7 +178,7 @@ export default function DashboardPage() {
               value={25}
               precision={1}
               valueStyle={{ color: "#722ed1" }}
-              prefix={<TrendingUpOutlined />}
+              prefix={<RiseOutlined />}
               suffix="%"
             />
             <div className={styles.metricChange}>

@@ -1,8 +1,8 @@
 "use client"
 
 import type React from "react"
-
-import { Layout, Menu, Button, Avatar, Dropdown, Badge, Input, Breadcrumb, Suspense } from "antd"
+import { Suspense } from "react"
+import { Layout, Menu, Button, Avatar, Dropdown, Badge, Input, Breadcrumb } from "antd"
 import {
   DashboardOutlined,
   WalletOutlined,
@@ -120,7 +120,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div>Loading...</div>}>
       <Layout className={styles.layout}>
         <Sider
           trigger={null}

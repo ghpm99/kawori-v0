@@ -1,10 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
+  experimental: {
+    optimizePackageImports: ['@ant-design/icons'],
+  },
   sassOptions: {
     includePaths: ['./styles'],
-  },
-  experimental: {
-    // Remove deprecated appDir option
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -14,6 +15,14 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: '/api/:path*',
+      },
+    ]
   },
 }
 
