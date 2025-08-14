@@ -1,8 +1,7 @@
 "use client"
 
 import { usePathname } from "next/navigation"
-import { Sidebar } from "@/components/sidebar"
-import { TopNav } from "@/components/top-nav"
+import DashboardLayout from "@/app/dashboard/layout"
 
 export function ConditionalLayout({ children }) {
   const pathname = usePathname()
@@ -12,13 +11,5 @@ export function ConditionalLayout({ children }) {
     return <>{children}</>
   }
 
-  return (
-    <div className="flex min-h-screen flex-col">
-      <TopNav />
-      <div className="flex flex-1">
-        <Sidebar />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
-      </div>
-    </div>
-  )
+  return <DashboardLayout>{children}</DashboardLayout>
 }
