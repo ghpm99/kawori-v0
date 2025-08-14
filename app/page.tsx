@@ -1,76 +1,112 @@
 "use client"
-import { ArrowRightOutlined, DashboardOutlined, TrophyOutlined, RiseOutlined } from "@ant-design/icons"
-import { useRouter } from "next/navigation"
+
+import { Button } from "antd"
+import { ArrowRightOutlined, DashboardOutlined, PieChartOutlined, WalletOutlined } from "@ant-design/icons"
+import Link from "next/link"
 import styles from "./landing.module.scss"
 
 export default function LandingPage() {
-  const router = useRouter()
-
-  const handleGoToDashboard = () => {
-    router.push("/dashboard")
-  }
-
-  const features = [
-    {
-      icon: <DashboardOutlined />,
-      title: "Dashboard Analytics",
-      description: "Comprehensive financial overview with real-time data visualization and insights.",
-    },
-    {
-      icon: <TrophyOutlined />,
-      title: "Budget Management",
-      description: "Smart budgeting tools to help you track expenses and achieve your financial goals.",
-    },
-    {
-      icon: <RiseOutlined />,
-      title: "Growth Tracking",
-      description: "Monitor your financial growth with detailed reports and performance metrics.",
-    },
-  ]
-
-  const stats = [
-    { number: "11,280", label: "Active Users" },
-    { number: "1,128,000", label: "Transactions" },
-    { number: "99.9%", label: "Success Rate" },
-    { number: "99.99%", label: "Uptime" },
-  ]
-
   return (
     <div className={styles.container}>
-      <div className={styles.hero}>
-        <h1 className={styles.title}>Kawori Financial</h1>
-        <p className={styles.subtitle}>
-          Take control of your finances with our modern, intuitive dashboard. Track expenses, manage budgets, and
-          achieve your financial goals with ease.
-        </p>
-        <div className={styles.buttons}>
-          <button className={styles.primaryButton} onClick={handleGoToDashboard}>
-            <DashboardOutlined />
-            Go to Dashboard
-            <ArrowRightOutlined />
-          </button>
-          <button className={styles.secondaryButton}>Learn More</button>
+      {/* Navigation */}
+      <nav className={styles.nav}>
+        <div className={styles.navContent}>
+          <div className={styles.logo}>
+            <WalletOutlined className={styles.logoIcon} />
+            <span className={styles.logoText}>Kawori Financial</span>
+          </div>
+          <div className={styles.navLinks}>
+            <Link href="/dashboard" className={styles.navLink}>
+              Dashboard
+            </Link>
+            <Link href="/budget" className={styles.navLink}>
+              Orçamento
+            </Link>
+            <Link href="/diary" className={styles.navLink}>
+              Diário
+            </Link>
+          </div>
         </div>
-      </div>
+      </nav>
 
-      <div className={styles.features}>
-        {features.map((feature, index) => (
-          <div key={index} className={styles.featureCard}>
-            <div className={styles.featureIcon}>{feature.icon}</div>
-            <h3 className={styles.featureTitle}>{feature.title}</h3>
-            <p className={styles.featureDescription}>{feature.description}</p>
+      {/* Hero Section */}
+      <section className={styles.hero}>
+        <div className={styles.heroContent}>
+          <h1 className={styles.heroTitle}>
+            Gerencie suas finanças com
+            <span className={styles.heroHighlight}> inteligência</span>
+          </h1>
+          <p className={styles.heroDescription}>
+            Kawori Financial é sua plataforma completa para controle financeiro pessoal. Monitore gastos, planeje
+            orçamentos e alcance seus objetivos financeiros.
+          </p>
+          <div className={styles.heroActions}>
+            <Link href="/dashboard">
+              <Button type="primary" size="large" icon={<DashboardOutlined />} className={styles.ctaButton}>
+                Acessar Dashboard
+                <ArrowRightOutlined />
+              </Button>
+            </Link>
           </div>
-        ))}
-      </div>
+        </div>
+        <div className={styles.heroVisual}>
+          <div className={styles.heroCard}>
+            <div className={styles.cardHeader}>
+              <PieChartOutlined className={styles.cardIcon} />
+              <span>Resumo Financeiro</span>
+            </div>
+            <div className={styles.cardContent}>
+              <div className={styles.metric}>
+                <span className={styles.metricLabel}>Receita</span>
+                <span className={styles.metricValue}>R$ 5.240</span>
+              </div>
+              <div className={styles.metric}>
+                <span className={styles.metricLabel}>Gastos</span>
+                <span className={styles.metricValue}>R$ 3.180</span>
+              </div>
+              <div className={styles.metric}>
+                <span className={styles.metricLabel}>Economia</span>
+                <span className={styles.metricValue}>R$ 2.060</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <div className={styles.stats}>
-        {stats.map((stat, index) => (
-          <div key={index} className={styles.statCard}>
-            <div className={styles.statNumber}>{stat.number}</div>
-            <div className={styles.statLabel}>{stat.label}</div>
+      {/* Features Section */}
+      <section className={styles.features}>
+        <div className={styles.featuresContent}>
+          <h2 className={styles.featuresTitle}>Recursos Principais</h2>
+          <div className={styles.featuresGrid}>
+            <div className={styles.featureCard}>
+              <DashboardOutlined className={styles.featureIcon} />
+              <h3>Dashboard Intuitivo</h3>
+              <p>Visualize todas suas informações financeiras em um só lugar</p>
+            </div>
+            <div className={styles.featureCard}>
+              <PieChartOutlined className={styles.featureIcon} />
+              <h3>Controle de Orçamento</h3>
+              <p>Defina metas e acompanhe seus gastos por categoria</p>
+            </div>
+            <div className={styles.featureCard}>
+              <WalletOutlined className={styles.featureIcon} />
+              <h3>Diário Financeiro</h3>
+              <p>Registre e categorize todas suas transações</p>
+            </div>
           </div>
-        ))}
-      </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className={styles.footer}>
+        <div className={styles.footerContent}>
+          <div className={styles.footerLogo}>
+            <WalletOutlined />
+            <span>Kawori Financial</span>
+          </div>
+          <p className={styles.footerText}>© 2024 Kawori Financial. Todos os direitos reservados.</p>
+        </div>
+      </footer>
     </div>
   )
 }

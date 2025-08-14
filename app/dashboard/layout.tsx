@@ -2,116 +2,119 @@
 
 import type React from "react"
 
-import { useState } from "react"
-import { Layout, Menu, Avatar, Dropdown, Breadcrumb, Input, Badge, Button, Suspense } from "antd"
+import { Layout, Menu, Button, Avatar, Dropdown, Badge, Input, Breadcrumb, Suspense } from "antd"
 import {
   DashboardOutlined,
   WalletOutlined,
-  BarChartOutlined,
+  PieChartOutlined,
+  FileTextOutlined,
   SettingOutlined,
-  UserOutlined,
-  LogoutOutlined,
+  BellOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  SearchOutlined,
-  BellOutlined,
+  UserOutlined,
+  LogoutOutlined,
+  ProfileOutlined,
 } from "@ant-design/icons"
-import { useRouter, usePathname } from "next/navigation"
+import { useState } from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import styles from "./layout.module.scss"
 
-const { Sider, Header, Content } = Layout
+const { Header, Sider, Content } = Layout
+const { Search } = Input
 
-interface DashboardLayoutProps {
+const menuItems = [
+  {
+    key: "/dashboard",
+    icon: <DashboardOutlined />,
+    label: <Link href="/dashboard">Dashboard</Link>,
+  },
+  {
+    key: "/budget",
+    icon: <PieChartOutlined />,
+    label: <Link href="/budget">Orçamento</Link>,
+  },
+  {
+    key: "/diary",
+    icon: <FileTextOutlined />,
+    label: <Link href="/diary">Diário</Link>,
+  },
+  {
+    key: "/invoices",
+    icon: <WalletOutlined />,
+    label: <Link href="/invoices">Faturas</Link>,
+  },
+  {
+    key: "/payments",
+    icon: <WalletOutlined />,
+    label: <Link href="/payments">Pagamentos</Link>,
+  },
+  {
+    key: "/reports",
+    icon: <FileTextOutlined />,
+    label: <Link href="/reports">Relatórios</Link>,
+  },
+  {
+    key: "/settings",
+    icon: <SettingOutlined />,
+    label: <Link href="/settings">Configurações</Link>,
+  },
+]
+
+const userMenuItems = [
+  {
+    key: "profile",
+    icon: <ProfileOutlined />,
+    label: "Perfil",
+  },
+  {
+    key: "settings",
+    icon: <SettingOutlined />,
+    label: "Configurações",
+  },
+  {
+    type: "divider" as const,
+  },
+  {
+    key: "logout",
+    icon: <LogoutOutlined />,
+    label: "Sair",
+    danger: true,
+  },
+]
+
+export default function DashboardLayout({
+  children,
+}: {
   children: React.ReactNode
-}
-
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+}) {
   const [collapsed, setCollapsed] = useState(false)
-  const [mobileMenuVisible, setMobileMenuVisible] = useState(false)
-  const router = useRouter()
   const pathname = usePathname()
-
-  const menuItems = [
-    {
-      key: "/dashboard",
-      icon: <DashboardOutlined />,
-      label: "Dashboard",
-    },
-    {
-      key: "/budget",
-      icon: <WalletOutlined />,
-      label: "Budget",
-    },
-    {
-      key: "/reports",
-      icon: <BarChartOutlined />,
-      label: "Reports",
-    },
-    {
-      key: "/settings",
-      icon: <SettingOutlined />,
-      label: "Settings",
-    },
-  ]
-
-  const userMenuItems = [
-    {
-      key: "profile",
-      icon: <UserOutlined />,
-      label: "Profile",
-    },
-    {
-      key: "settings",
-      icon: <SettingOutlined />,
-      label: "Settings",
-    },
-    {
-      type: "divider" as const,
-    },
-    {
-      key: "logout",
-      icon: <LogoutOutlined />,
-      label: "Logout",
-      danger: true,
-    },
-  ]
-
-  const handleMenuClick = ({ key }: { key: string }) => {
-    router.push(key)
-    setMobileMenuVisible(false)
-  }
-
-  const handleUserMenuClick = ({ key }: { key: string }) => {
-    if (key === "logout") {
-      router.push("/")
-    } else if (key === "settings") {
-      router.push("/settings")
-    }
-  }
-
-  const toggleSidebar = () => {
-    setCollapsed(!collapsed)
-    if (window.innerWidth <= 768) {
-      setMobileMenuVisible(!mobileMenuVisible)
-    }
-  }
 
   const getBreadcrumbItems = () => {
     const pathSegments = pathname.split("/").filter(Boolean)
     const items = [
       {
-        title: "Home",
+        title: <Link href="/dashboard">Dashboard</Link>,
       },
     ]
 
-    pathSegments.forEach((segment, index) => {
-      const path = "/" + pathSegments.slice(0, index + 1).join("/")
-      const title = segment.charAt(0).toUpperCase() + segment.slice(1)
+    if (pathSegments.length > 1) {
+      const currentPage = pathSegments[pathSegments.length - 1]
+      const pageNames: Record<string, string> = {
+        budget: "Orçamento",
+        diary: "Diário",
+        invoices: "Faturas",
+        payments: "Pagamentos",
+        reports: "Relatórios",
+        settings: "Configurações",
+      }
+
       items.push({
-        title,
-        href: path,
+        title: pageNames[currentPage] || currentPage,
       })
-    })
+    }
 
     return items
   }
@@ -119,102 +122,49 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <Suspense fallback={null}>
       <Layout className={styles.layout}>
-        {/* Mobile Overlay */}
-        <div
-          className={`${styles.mobileOverlay} ${mobileMenuVisible ? styles.visible : ""}`}
-          onClick={() => setMobileMenuVisible(false)}
-        />
-
-        {/* Sidebar */}
         <Sider
-          className={`${styles.sidebar} ${collapsed ? styles.collapsed : ""}`}
+          trigger={null}
+          collapsible
           collapsed={collapsed}
-          collapsedWidth={window?.innerWidth <= 768 ? 0 : 80}
-          width={200}
-          style={{
-            transform: mobileMenuVisible
-              ? "translateX(0)"
-              : window?.innerWidth <= 768
-                ? "translateX(-100%)"
-                : "translateX(0)",
-          }}
+          className={styles.sider}
+          width={280}
+          collapsedWidth={80}
         >
-          <div className={styles.sidebarContent}>
-            {/* Logo */}
-            <div className={styles.logo}>
-              <h2 className={collapsed ? styles.logoCollapsed : ""}>{collapsed ? "KF" : "Kawori Financial"}</h2>
-            </div>
-
-            {/* Menu */}
-            <Menu
-              className={styles.menu}
-              mode="inline"
-              selectedKeys={[pathname]}
-              items={menuItems}
-              onClick={handleMenuClick}
-            />
-
-            {/* User Section */}
-            <div className={styles.userSection}>
-              <Dropdown
-                menu={{
-                  items: userMenuItems,
-                  onClick: handleUserMenuClick,
-                }}
-                placement="topRight"
-                trigger={["click"]}
-              >
-                <div className={styles.userInfo}>
-                  <Avatar className={styles.userAvatar} size="small">
-                    JD
-                  </Avatar>
-                  {!collapsed && (
-                    <div className={styles.userDetails}>
-                      <p className={styles.userName}>John Doe</p>
-                      <p className={styles.userRole}>Administrator</p>
-                    </div>
-                  )}
-                </div>
-              </Dropdown>
-            </div>
+          <div className={styles.logo}>
+            <WalletOutlined className={styles.logoIcon} />
+            {!collapsed && <span className={styles.logoText}>Kawori Financial</span>}
           </div>
+          <Menu theme="light" mode="inline" selectedKeys={[pathname]} items={menuItems} className={styles.menu} />
         </Sider>
 
-        {/* Main Content */}
-        <Layout className={`${styles.mainContent} ${collapsed ? styles.collapsed : ""}`}>
-          {/* Header */}
+        <Layout className={styles.mainLayout}>
           <Header className={styles.header}>
             <div className={styles.headerLeft}>
               <Button
                 type="text"
                 icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                onClick={toggleSidebar}
-                className={styles.menuButton}
+                onClick={() => setCollapsed(!collapsed)}
+                className={styles.collapseButton}
               />
-              <Breadcrumb className={styles.breadcrumb} items={getBreadcrumbItems()} />
+              <Breadcrumb items={getBreadcrumbItems()} className={styles.breadcrumb} />
             </div>
 
             <div className={styles.headerRight}>
-              <Input className={styles.searchInput} placeholder="Search..." prefix={<SearchOutlined />} />
-              <Badge count={5} size="small">
+              <Search placeholder="Buscar..." allowClear className={styles.search} style={{ width: 250 }} />
+
+              <Badge count={3} size="small">
                 <Button type="text" icon={<BellOutlined />} className={styles.notificationButton} />
               </Badge>
-              <Dropdown
-                menu={{
-                  items: userMenuItems,
-                  onClick: handleUserMenuClick,
-                }}
-                placement="bottomRight"
-                trigger={["click"]}
-              >
-                <Avatar className={styles.userAvatar} style={{ cursor: "pointer" }}>
-                  JD
-                </Avatar>
+
+              <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={["click"]}>
+                <div className={styles.userProfile}>
+                  <Avatar size="small" icon={<UserOutlined />} className={styles.avatar} />
+                  <span className={styles.userName}>João Silva</span>
+                </div>
               </Dropdown>
             </div>
           </Header>
 
-          {/* Content */}
           <Content className={styles.content}>{children}</Content>
         </Layout>
       </Layout>

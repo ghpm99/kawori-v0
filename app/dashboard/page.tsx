@@ -1,318 +1,286 @@
 "use client"
 
-import { useState } from "react"
-import { Card, Select, DatePicker, Table, Tag, Button, Space } from "antd"
+import { Card, Row, Col, Statistic, Progress, Table, Tag, Button, Space } from "antd"
 import {
+  ArrowUpOutlined,
+  ArrowDownOutlined,
   DollarOutlined,
+  ShoppingCartOutlined,
+  TrophyOutlined,
   TrendingUpOutlined,
-  TrendingDownOutlined,
-  PercentageOutlined,
+  EyeOutlined,
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts"
-import { formatCurrency, formatDate, formatPercentage } from "@/lib/utils"
 import styles from "./dashboard.module.scss"
 
-const { RangePicker } = DatePicker
+const revenueData = [
+  { month: "Jan", revenue: 4000, expenses: 2400 },
+  { month: "Fev", revenue: 3000, expenses: 1398 },
+  { month: "Mar", revenue: 2000, expenses: 9800 },
+  { month: "Abr", revenue: 2780, expenses: 3908 },
+  { month: "Mai", revenue: 1890, expenses: 4800 },
+  { month: "Jun", revenue: 2390, expenses: 3800 },
+]
+
+const expenseData = [
+  { category: "Alimentação", amount: 1200 },
+  { category: "Transporte", amount: 800 },
+  { category: "Moradia", amount: 2000 },
+  { category: "Lazer", amount: 600 },
+  { category: "Saúde", amount: 400 },
+]
+
+const transactionColumns = [
+  {
+    title: "Data",
+    dataIndex: "date",
+    key: "date",
+  },
+  {
+    title: "Descrição",
+    dataIndex: "description",
+    key: "description",
+  },
+  {
+    title: "Categoria",
+    dataIndex: "category",
+    key: "category",
+    render: (category: string) => <Tag color={category === "Receita" ? "green" : "red"}>{category}</Tag>,
+  },
+  {
+    title: "Valor",
+    dataIndex: "amount",
+    key: "amount",
+    render: (amount: number) => (
+      <span className={amount > 0 ? styles.positive : styles.negative}>
+        R$ {Math.abs(amount).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+      </span>
+    ),
+  },
+  {
+    title: "Status",
+    dataIndex: "status",
+    key: "status",
+    render: (status: string) => <Tag color={status === "Concluído" ? "green" : "orange"}>{status}</Tag>,
+  },
+  {
+    title: "Ações",
+    key: "actions",
+    render: () => (
+      <Space size="middle">
+        <Button type="text" icon={<EyeOutlined />} size="small" />
+        <Button type="text" icon={<EditOutlined />} size="small" />
+        <Button type="text" icon={<DeleteOutlined />} size="small" danger />
+      </Space>
+    ),
+  },
+]
+
+const transactionData = [
+  {
+    key: "1",
+    date: "2024-01-15",
+    description: "Salário",
+    category: "Receita",
+    amount: 5000,
+    status: "Concluído",
+  },
+  {
+    key: "2",
+    date: "2024-01-14",
+    description: "Supermercado",
+    category: "Alimentação",
+    amount: -250,
+    status: "Concluído",
+  },
+  {
+    key: "3",
+    date: "2024-01-13",
+    description: "Combustível",
+    category: "Transporte",
+    amount: -120,
+    status: "Pendente",
+  },
+  {
+    key: "4",
+    date: "2024-01-12",
+    description: "Freelance",
+    category: "Receita",
+    amount: 800,
+    status: "Concluído",
+  },
+]
 
 export default function DashboardPage() {
-  const [selectedPeriod, setSelectedPeriod] = useState("7d")
-  const [selectedStatus, setSelectedStatus] = useState("all")
-
-  // Mock data
-  const metrics = [
-    {
-      key: "revenue",
-      title: "Revenue",
-      value: 24500,
-      change: 12.5,
-      icon: <DollarOutlined />,
-      trend: "up",
-    },
-    {
-      key: "expenses",
-      title: "Expenses",
-      value: 8200,
-      change: -3.2,
-      icon: <TrendingDownOutlined />,
-      trend: "down",
-    },
-    {
-      key: "profit",
-      title: "Profit",
-      value: 16300,
-      change: 18.7,
-      icon: <TrendingUpOutlined />,
-      trend: "up",
-    },
-    {
-      key: "growth",
-      title: "Growth",
-      value: 25,
-      change: 5.3,
-      icon: <PercentageOutlined />,
-      trend: "up",
-      isPercentage: true,
-    },
-  ]
-
-  const chartData = [
-    { month: "Jan", revenue: 12000, expenses: 8000 },
-    { month: "Feb", revenue: 15000, expenses: 9000 },
-    { month: "Mar", revenue: 18000, expenses: 7500 },
-    { month: "Apr", revenue: 22000, expenses: 8500 },
-    { month: "May", revenue: 20000, expenses: 9200 },
-    { month: "Jun", revenue: 24500, expenses: 8200 },
-  ]
-
-  const barChartData = [
-    { category: "Food", amount: 2500 },
-    { category: "Transport", amount: 1800 },
-    { category: "Entertainment", amount: 1200 },
-    { category: "Utilities", amount: 800 },
-    { category: "Shopping", amount: 2200 },
-  ]
-
-  const transactions = [
-    {
-      key: "1",
-      id: "TXN001",
-      description: "Salary Payment",
-      amount: 5000,
-      date: new Date("2024-01-15"),
-      status: "completed",
-    },
-    {
-      key: "2",
-      id: "TXN002",
-      description: "Grocery Shopping",
-      amount: -150,
-      date: new Date("2024-01-14"),
-      status: "completed",
-    },
-    {
-      key: "3",
-      id: "TXN003",
-      description: "Utility Bill",
-      amount: -80,
-      date: new Date("2024-01-13"),
-      status: "pending",
-    },
-    {
-      key: "4",
-      id: "TXN004",
-      description: "Investment Return",
-      amount: 1200,
-      date: new Date("2024-01-12"),
-      status: "completed",
-    },
-    {
-      key: "5",
-      id: "TXN005",
-      description: "Online Purchase",
-      amount: -299,
-      date: new Date("2024-01-11"),
-      status: "failed",
-    },
-  ]
-
-  const columns = [
-    {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
-      width: 100,
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-    },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      key: "amount",
-      render: (amount: number) => (
-        <span style={{ color: amount > 0 ? "#52c41a" : "#ff4d4f", fontWeight: 600 }}>
-          {formatCurrency(Math.abs(amount))}
-        </span>
-      ),
-    },
-    {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
-      render: (date: Date) => formatDate(date),
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status: string) => (
-        <Tag className={`${styles.statusTag} ${styles[status]}`}>
-          {status.charAt(0).toUpperCase() + status.slice(1)}
-        </Tag>
-      ),
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      width: 120,
-      render: () => (
-        <Space className={styles.actionButtons}>
-          <Button type="text" size="small" icon={<EditOutlined />} />
-          <Button type="text" size="small" icon={<DeleteOutlined />} danger />
-        </Space>
-      ),
-    },
-  ]
-
-  const filteredTransactions = transactions.filter((transaction) => {
-    if (selectedStatus === "all") return true
-    return transaction.status === selectedStatus
-  })
-
   return (
-    <div className={styles.dashboard}>
-      {/* Metrics Grid */}
-      <div className={styles.metricsGrid}>
-        {metrics.map((metric) => (
-          <Card key={metric.key} className={`${styles.metricCard} ${styles[metric.key]}`}>
-            <div className={styles.metricContent}>
-              <div className={styles.metricHeader}>
-                <div className={`${styles.metricIcon} ${styles[metric.key]}`}>{metric.icon}</div>
-                <div className={`${styles.metricChange} ${metric.trend === "up" ? styles.positive : styles.negative}`}>
-                  {metric.trend === "up" ? "+" : ""}
-                  {formatPercentage(metric.change)}
-                </div>
-              </div>
-              <div className={styles.metricBody}>
-                <h3 className={styles.metricValue}>
-                  {metric.isPercentage ? formatPercentage(metric.value, 0) : formatCurrency(metric.value)}
-                </h3>
-                <p className={styles.metricLabel}>{metric.title}</p>
-              </div>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Dashboard Financeiro</h1>
+        <p className={styles.subtitle}>Visão geral das suas finanças</p>
+      </div>
+
+      {/* Métricas Principais */}
+      <Row gutter={[24, 24]} className={styles.metricsRow}>
+        <Col xs={24} sm={12} lg={6}>
+          <Card className={styles.metricCard}>
+            <Statistic
+              title="Receita Total"
+              value={24500}
+              precision={2}
+              valueStyle={{ color: "#3f8600" }}
+              prefix={<DollarOutlined />}
+              suffix="R$"
+            />
+            <div className={styles.metricChange}>
+              <ArrowUpOutlined className={styles.positive} />
+              <span className={styles.positive}>12.5%</span>
             </div>
           </Card>
-        ))}
-      </div>
-
-      {/* Charts Section */}
-      <div className={styles.chartsSection}>
-        <Card
-          className={styles.chartCard}
-          title="Revenue vs Expenses"
-          extra={
-            <div className={styles.chartControls}>
-              <Select
-                value={selectedPeriod}
-                onChange={setSelectedPeriod}
-                options={[
-                  { label: "7 Days", value: "7d" },
-                  { label: "30 Days", value: "30d" },
-                  { label: "90 Days", value: "90d" },
-                  { label: "1 Year", value: "1y" },
-                ]}
-              />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card className={styles.metricCard}>
+            <Statistic
+              title="Gastos Totais"
+              value={8200}
+              precision={2}
+              valueStyle={{ color: "#cf1322" }}
+              prefix={<ShoppingCartOutlined />}
+              suffix="R$"
+            />
+            <div className={styles.metricChange}>
+              <ArrowDownOutlined className={styles.negative} />
+              <span className={styles.negative}>3.2%</span>
             </div>
-          }
-        >
-          <div className={styles.chartContainer}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="month" stroke="#8c8c8c" />
-                <YAxis stroke="#8c8c8c" />
-                <Tooltip
-                  formatter={(value: number) => [formatCurrency(value), ""]}
-                  labelStyle={{ color: "#262626" }}
-                  contentStyle={{
-                    backgroundColor: "#ffffff",
-                    border: "1px solid #d9d9d9",
-                    borderRadius: "6px",
-                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#1890ff"
-                  strokeWidth={3}
-                  dot={{ fill: "#1890ff", strokeWidth: 2, r: 4 }}
-                  activeDot={{ r: 6, stroke: "#1890ff", strokeWidth: 2 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="expenses"
-                  stroke="#ff4d4f"
-                  strokeWidth={3}
-                  dot={{ fill: "#ff4d4f", strokeWidth: 2, r: 4 }}
-                  activeDot={{ r: 6, stroke: "#ff4d4f", strokeWidth: 2 }}
-                />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card className={styles.metricCard}>
+            <Statistic
+              title="Lucro Líquido"
+              value={16300}
+              precision={2}
+              valueStyle={{ color: "#1890ff" }}
+              prefix={<TrophyOutlined />}
+              suffix="R$"
+            />
+            <div className={styles.metricChange}>
+              <ArrowUpOutlined className={styles.positive} />
+              <span className={styles.positive}>18.7%</span>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card className={styles.metricCard}>
+            <Statistic
+              title="Crescimento"
+              value={25}
+              precision={1}
+              valueStyle={{ color: "#722ed1" }}
+              prefix={<TrendingUpOutlined />}
+              suffix="%"
+            />
+            <div className={styles.metricChange}>
+              <ArrowUpOutlined className={styles.positive} />
+              <span className={styles.positive}>5.3%</span>
+            </div>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Gráficos */}
+      <Row gutter={[24, 24]} className={styles.chartsRow}>
+        <Col xs={24} lg={16}>
+          <Card title="Receita vs Gastos" className={styles.chartCard}>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={revenueData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip formatter={(value: number) => [`R$ ${value.toLocaleString("pt-BR")}`, ""]} />
+                <Line type="monotone" dataKey="revenue" stroke="#52c41a" strokeWidth={3} name="Receita" />
+                <Line type="monotone" dataKey="expenses" stroke="#ff4d4f" strokeWidth={3} name="Gastos" />
               </LineChart>
             </ResponsiveContainer>
-          </div>
-        </Card>
-
-        <Card className={styles.chartCard} title="Expenses by Category">
-          <div className={styles.chartContainer}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={barChartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="category" stroke="#8c8c8c" />
-                <YAxis stroke="#8c8c8c" />
-                <Tooltip
-                  formatter={(value: number) => [formatCurrency(value), "Amount"]}
-                  labelStyle={{ color: "#262626" }}
-                  contentStyle={{
-                    backgroundColor: "#ffffff",
-                    border: "1px solid #d9d9d9",
-                    borderRadius: "6px",
-                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                  }}
-                />
-                <Bar dataKey="amount" fill="#1890ff" radius={[4, 4, 0, 0]} />
+          </Card>
+        </Col>
+        <Col xs={24} lg={8}>
+          <Card title="Gastos por Categoria" className={styles.chartCard}>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={expenseData} layout="horizontal">
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis dataKey="category" type="category" width={80} />
+                <Tooltip formatter={(value: number) => [`R$ ${value.toLocaleString("pt-BR")}`, "Valor"]} />
+                <Bar dataKey="amount" fill="#1890ff" />
               </BarChart>
             </ResponsiveContainer>
-          </div>
-        </Card>
-      </div>
+          </Card>
+        </Col>
+      </Row>
 
-      {/* Transactions Section */}
-      <div className={styles.transactionsSection}>
-        <Card className={styles.transactionsCard} title="Recent Transactions">
-          <div className={styles.transactionsHeader}>
-            <div className={styles.transactionsFilters}>
-              <Select
-                value={selectedStatus}
-                onChange={setSelectedStatus}
-                style={{ width: 120 }}
-                options={[
-                  { label: "All Status", value: "all" },
-                  { label: "Completed", value: "completed" },
-                  { label: "Pending", value: "pending" },
-                  { label: "Failed", value: "failed" },
-                ]}
-              />
-              <RangePicker />
+      {/* Metas de Economia */}
+      <Row gutter={[24, 24]} className={styles.goalsRow}>
+        <Col xs={24} lg={12}>
+          <Card title="Metas de Economia" className={styles.goalsCard}>
+            <div className={styles.goalItem}>
+              <div className={styles.goalHeader}>
+                <span>Viagem de Férias</span>
+                <span>R$ 3.500 / R$ 5.000</span>
+              </div>
+              <Progress percent={70} strokeColor="#52c41a" />
             </div>
-          </div>
-          <div className={styles.transactionsTable}>
+            <div className={styles.goalItem}>
+              <div className={styles.goalHeader}>
+                <span>Emergência</span>
+                <span>R$ 2.800 / R$ 10.000</span>
+              </div>
+              <Progress percent={28} strokeColor="#faad14" />
+            </div>
+            <div className={styles.goalItem}>
+              <div className={styles.goalHeader}>
+                <span>Novo Carro</span>
+                <span>R$ 8.200 / R$ 25.000</span>
+              </div>
+              <Progress percent={33} strokeColor="#1890ff" />
+            </div>
+          </Card>
+        </Col>
+        <Col xs={24} lg={12}>
+          <Card title="Resumo do Mês" className={styles.summaryCard}>
+            <div className={styles.summaryItem}>
+              <span className={styles.summaryLabel}>Orçamento Planejado</span>
+              <span className={styles.summaryValue}>R$ 4.500</span>
+            </div>
+            <div className={styles.summaryItem}>
+              <span className={styles.summaryLabel}>Gasto Atual</span>
+              <span className={styles.summaryValue}>R$ 3.200</span>
+            </div>
+            <div className={styles.summaryItem}>
+              <span className={styles.summaryLabel}>Restante</span>
+              <span className={`${styles.summaryValue} ${styles.positive}`}>R$ 1.300</span>
+            </div>
+            <div className={styles.summaryProgress}>
+              <Progress percent={71} strokeColor="#52c41a" format={() => "71% do orçamento usado"} />
+            </div>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Transações Recentes */}
+      <Row gutter={[24, 24]} className={styles.transactionsRow}>
+        <Col span={24}>
+          <Card title="Transações Recentes" className={styles.transactionsCard}>
             <Table
-              columns={columns}
-              dataSource={filteredTransactions}
-              pagination={{
-                pageSize: 10,
-                showSizeChanger: true,
-                showQuickJumper: true,
-                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} transactions`,
-              }}
+              columns={transactionColumns}
+              dataSource={transactionData}
+              pagination={{ pageSize: 5 }}
               scroll={{ x: 800 }}
             />
-          </div>
-        </Card>
-      </div>
+          </Card>
+        </Col>
+      </Row>
     </div>
   )
 }

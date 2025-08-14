@@ -1,10 +1,11 @@
 import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
-  return clsx(inputs)
+  return twMerge(clsx(inputs))
 }
 
-// Date formatting functions
+// Date formatting utilities
 export function formatDate(date: Date | string | number): string {
   const d = new Date(date)
   return d.toLocaleDateString("pt-BR", {
@@ -19,7 +20,6 @@ export function formatTime(date: Date | string | number): string {
   return d.toLocaleTimeString("pt-BR", {
     hour: "2-digit",
     minute: "2-digit",
-    second: "2-digit",
   })
 }
 
@@ -27,7 +27,7 @@ export function formatDateTime(date: Date | string | number): string {
   return `${formatDate(date)} ${formatTime(date)}`
 }
 
-// Number formatting functions
+// Number formatting utilities
 export function formatCurrency(amount: number, currency = "BRL"): string {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -44,22 +44,15 @@ export function formatPercentage(value: number, decimals = 1): string {
 }
 
 export function formatCompactNumber(num: number): string {
-  if (num >= 1000000) {
-    return `${(num / 1000000).toFixed(1)}M`
-  }
-  if (num >= 1000) {
-    return `${(num / 1000).toFixed(1)}K`
-  }
-  return num.toString()
+  return new Intl.NumberFormat("pt-BR", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(num)
 }
 
 // String utilities
-export function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase())
-    .join("")
-    .slice(0, 2)
+export function capitalizeFirst(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
 export function truncateText(text: string, maxLength: number): string {
@@ -67,8 +60,13 @@ export function truncateText(text: string, maxLength: number): string {
   return text.slice(0, maxLength) + "..."
 }
 
-export function capitalizeFirst(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+export function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((word) => word.charAt(0))
+    .join("")
+    .toUpperCase()
+    .slice(0, 2)
 }
 
 // Validation utilities
@@ -88,10 +86,6 @@ export function debounce<T extends (...args: any[]) => any>(func: T, wait: numbe
     clearTimeout(timeout)
     timeout = setTimeout(() => func(...args), wait)
   }
-}
-
-export function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 // Array utilities
@@ -119,43 +113,50 @@ export function sortBy<T>(array: T[], key: keyof T, direction: "asc" | "desc" = 
 }
 
 // Color utilities
-export function getStatusColor(status: string): string {
-  const colors: Record<string, string> = {
-    completed: "#52c41a",
-    pending: "#faad14",
-    failed: "#ff4d4f",
-    active: "#1890ff",
-    inactive: "#8c8c8c",
-  }
-  return colors[status.toLowerCase()] || "#8c8c8c"
+export function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  return result
+    ? {
+        r: Number.parseInt(result[1], 16),
+        g: Number.parseInt(result[2], 16),
+        b: Number.parseInt(result[3], 16),
+      }
+    : null
+}
+
+export function rgbToHex(r: number, g: number, b: number): string {
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
 }
 
 // Local storage utilities
-export function getFromStorage(key: string): any {
-  if (typeof window === "undefined") return null
+export function getFromStorage<T>(key: string, defaultValue: T): T {
+  if (typeof window === "undefined") return defaultValue
+
   try {
     const item = window.localStorage.getItem(key)
-    return item ? JSON.parse(item) : null
+    return item ? JSON.parse(item) : defaultValue
   } catch (error) {
-    console.error("Error reading from localStorage:", error)
-    return null
+    console.error(`Error reading localStorage key "${key}":`, error)
+    return defaultValue
   }
 }
 
-export function setToStorage(key: string, value: any): void {
+export function setToStorage<T>(key: string, value: T): void {
   if (typeof window === "undefined") return
+
   try {
     window.localStorage.setItem(key, JSON.stringify(value))
   } catch (error) {
-    console.error("Error writing to localStorage:", error)
+    console.error(`Error setting localStorage key "${key}":`, error)
   }
 }
 
 export function removeFromStorage(key: string): void {
   if (typeof window === "undefined") return
+
   try {
     window.localStorage.removeItem(key)
   } catch (error) {
-    console.error("Error removing from localStorage:", error)
+    console.error(`Error removing localStorage key "${key}":`, error)
   }
 }
