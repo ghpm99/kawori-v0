@@ -1,0 +1,115 @@
+.sidebar {
+  :global(.ant-layout-sider) {
+    background: #001529;
+    
+    .ant-layout-sider-trigger {
+      background: #002140;
+      color: #fff;
+      
+      &:hover {
+        background: #1890ff;
+      }
+    }
+  }
+  
+  .logo {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #002140;
+    margin-bottom: 16px;
+    
+    .logoText {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 600;
+    }
+  }
+  
+  .menu {
+    :global(.ant-menu) {
+      background: transparent;
+      border-right: none;
+      
+      .ant-menu-item {
+        color: rgba(255, 255, 255, 0.65);
+        
+        &:hover {
+          color: #fff;
+          background: rgba(255, 255, 255, 0.1);
+        }
+        
+        &.ant-menu-item-selected {
+          background: #1890ff;
+          color: #fff;
+        }
+      }
+      
+      .ant-menu-submenu-title {
+        color: rgba(255, 255, 255, 0.65);
+        
+        &:hover {
+          color: #fff;
+        }
+      }
+    }
+  }
+  
+  .userSection {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px;
+    background: #002140;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    
+    .userInfo {
+      display: flex;
+      align-items: center;
+      color: #fff;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background 0.3s;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      
+      .avatar {
+        margin-right: 12px;
+      }
+      
+      .userDetails {
+        flex: 1;
+        
+        .userName {
+          font-size: 14px;
+          font-weight: 500;
+          margin-bottom: 2px;
+        }
+        
+        .userRole {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.65);
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    .userSection {
+      padding: 12px;
+      
+      .userInfo {
+        .userDetails {
+          display: none;
+        }
+      }
+    }
+  }
+}
