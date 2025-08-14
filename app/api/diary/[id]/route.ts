@@ -19,12 +19,18 @@ const activities = [
   },
   {
     id: "2",
-    name: "Team meeting",
+    title: "Team meeting",
     description: "Weekly team sync to discuss project progress and blockers",
-    startDate: "2024-01-16T10:00:00Z",
-    status: "in-progress",
-    priority: "medium",
+    category: "work" as const,
+    priority: "medium" as const,
+    status: "in-progress" as const,
+    date: "2024-01-16",
+    startTime: "10:00",
+    endTime: "11:00",
     tags: ["meeting", "team"],
+    notes: "Discussed Q1 goals and project timeline.",
+    createdAt: "2024-01-16T09:00:00Z",
+    updatedAt: "2024-01-16T10:30:00Z",
   },
 ]
 
@@ -81,4 +87,3 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 
   return NextResponse.json({ message: "Activity deleted successfully" })
 }
-</merged_code>

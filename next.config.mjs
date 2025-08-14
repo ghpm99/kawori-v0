@@ -3,6 +3,9 @@ const nextConfig = {
   sassOptions: {
     includePaths: ['./styles'],
   },
+  experimental: {
+    // Remove deprecated appDir option
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -12,6 +15,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig
