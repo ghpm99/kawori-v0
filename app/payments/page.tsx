@@ -11,8 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Plus, Search, Edit, Trash2, TrendingUp, TrendingDown } from "lucide-react"
+import { Plus, Search, Edit, Trash2, TrendingUp, TrendingDown, Upload } from "lucide-react"
 import { useFinancial } from "@/contexts/financial-context"
+import { CSVImportModal } from "@/components/csv-import/csv-import-modal"
 
 export default function PaymentsPage() {
   const {
@@ -44,6 +45,8 @@ export default function PaymentsPage() {
     reference: "",
     type: "income" as const,
   })
+
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false)
 
   const stats = getPaymentStats()
 
@@ -119,13 +122,18 @@ export default function PaymentsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Payments</h1>
-        <Button onClick={() => setIsPaymentModalOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Payment
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setIsImportModalOpen(true)}>
+            <Upload className="mr-2 h-4 w-4" />
+            Importar CSV
+          </Button>
+          <Button onClick={() => setIsPaymentModalOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            New Payment
+          </Button>
+        </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-2">
@@ -161,7 +169,6 @@ export default function PaymentsPage() {
         </Card>
       </div>
 
-      {/* Filters and Table */}
       <Card>
         <CardHeader>
           <CardTitle>Payments</CardTitle>
@@ -248,7 +255,6 @@ export default function PaymentsPage() {
         </CardContent>
       </Card>
 
-      {/* Payment Modal */}
       <Dialog open={isPaymentModalOpen} onOpenChange={setIsPaymentModalOpen}>
         <DialogContent>
           <DialogHeader>
@@ -355,6 +361,8 @@ export default function PaymentsPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <CSVImportModal open={isImportModalOpen} onOpenChange={setIsImportModalOpen} defaultType="payments" />
     </div>
   )
 }

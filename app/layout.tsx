@@ -2,21 +2,22 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+import { ThemeProvider } from "@/components/theme-provider"
 import { AntdRegistry } from "@ant-design/nextjs-registry"
 import { ConfigProvider } from "antd"
-import { ThemeProvider } from "@/components/theme-provider"
+import { QueryProvider } from "@/contexts/query-provider"
+import { I18nProvider } from "@/contexts/i18n-context"
+import { SettingsProvider } from "@/contexts/settings-context"
 import { BudgetProvider } from "@/contexts/budget-context"
 import { DiaryProvider } from "@/contexts/diary-context"
 import { FinancialProvider } from "@/contexts/financial-context"
-import { SettingsProvider } from "@/contexts/settings-context"
-import { I18nProvider } from "@/contexts/i18n-context"
-import { QueryProvider } from "@/contexts/query-provider"
+import { ConditionalLayout } from "@/components/conditional-layout"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Kawori Financial - Personal Finance Management",
-  description: "Manage your finances with ease using Kawori Financial dashboard",
+  title: "Kawori Financial",
+  description: "Sistema de gestão financeira pessoal",
     generator: 'v0.app'
 }
 
@@ -26,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="pt-BR">
       <body className={inter.className}>
         <QueryProvider>
           <I18nProvider>
@@ -40,24 +41,10 @@ export default function RootLayout({
                           theme={{
                             token: {
                               colorPrimary: "#1890ff",
-                              colorSuccess: "#52c41a",
-                              colorWarning: "#faad14",
-                              colorError: "#ff4d4f",
-                              borderRadius: 6,
-                            },
-                            components: {
-                              Layout: {
-                                siderBg: "#ffffff",
-                                headerBg: "#ffffff",
-                              },
-                              Menu: {
-                                itemBg: "transparent",
-                                itemSelectedBg: "#e6f7ff",
-                              },
                             },
                           }}
                         >
-                          {children}
+                          <ConditionalLayout>{children}</ConditionalLayout>
                         </ConfigProvider>
                       </AntdRegistry>
                     </ThemeProvider>

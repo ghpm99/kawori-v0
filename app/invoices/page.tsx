@@ -12,9 +12,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Plus, Search, Edit, Trash2, Eye } from "lucide-react"
+import { Plus, Search, Edit, Trash2, Eye, Upload } from "lucide-react"
 import { useFinancial } from "@/contexts/financial-context"
 import { useTranslation } from "@/hooks/use-translation"
+import { CSVImportModal } from "@/components/csv-import/csv-import-modal"
 
 export default function InvoicesPage() {
   const { t } = useTranslation()
@@ -50,6 +51,8 @@ export default function InvoicesPage() {
     status: "draft" as const,
     tags: [] as string[],
   })
+
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false)
 
   const stats = getInvoiceStats()
 
@@ -127,13 +130,18 @@ export default function InvoicesPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">{t("invoices.title")}</h1>
-        <Button onClick={() => setIsInvoiceModalOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t("invoices.create")}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setIsImportModalOpen(true)}>
+            <Upload className="mr-2 h-4 w-4" />
+            Importar CSV
+          </Button>
+          <Button onClick={() => setIsInvoiceModalOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t("invoices.create")}
+          </Button>
+        </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2">
@@ -169,7 +177,6 @@ export default function InvoicesPage() {
         </Card>
       </div>
 
-      {/* Filters */}
       <Card>
         <CardHeader>
           <CardTitle>{t("invoices.title")}</CardTitle>
@@ -249,7 +256,6 @@ export default function InvoicesPage() {
         </CardContent>
       </Card>
 
-      {/* Invoice Modal */}
       <Dialog open={isInvoiceModalOpen} onOpenChange={setIsInvoiceModalOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -335,6 +341,8 @@ export default function InvoicesPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <CSVImportModal open={isImportModalOpen} onOpenChange={setIsImportModalOpen} defaultType="invoices" />
     </div>
   )
 }
